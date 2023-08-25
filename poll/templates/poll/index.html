@@ -1,0 +1,14 @@
+{% extends 'poll/layout.html' %}
+
+{% block body %}
+<h1>Welcome to the App</h1>
+{% if latest_questions %}
+<ul>
+    {% for question in latest_questions %}
+    <li><a href="{% url 'poll:details' question.id %}">{{question}}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<h4>No Questions to show</h4>
+{% endif %}
+{% endblock %}

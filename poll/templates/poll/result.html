@@ -1,0 +1,15 @@
+{% extends 'poll/layout.html' %}
+
+{% block body %}
+<h1>Results</h1>
+
+<ol>
+    {% for choice in question.choice_set.all %}
+    <li>{{choice.choice_text}} -- {{choice.votes}} vote{{choice.votes|pluralize}}</li>
+    {% endfor %}
+
+    <a href="{% url 'poll:details' question.id %}">Click here to go back</a>
+
+</ol>
+
+{% endblock %}
