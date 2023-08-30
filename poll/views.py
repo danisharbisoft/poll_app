@@ -2,23 +2,28 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from .models import Question, Choice
 from django.urls import reverse
+from django.views import generic
+from django.utils import timezone
 
 
-def index(request):
-    latest_questions = Question.objects.order_by('-pub_date')[:5]
-    output = ','.join([q.question_text for q in latest_questions])
-    return render(request, 'poll/index.html', {
-        'latest_questions': latest_questions
-    })
+class IndexView(generic.ListView):
+    template_name = 'poll/index.html'
+    context_object_name = 'latest_questions'
+
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
 
 
-# Create your views here
+class DetailView(generic.DetailView):
+    template_name = 'poll/details.html'
 
-def details(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'poll/details.html', {
-        'question': question
-    })
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now())
+
+
+class ResultView(generic.DetailView):
+    model = Question
+    template_name = 'poll/result.html'
 
 
 def vote(request, question_id):
@@ -35,11 +40,3 @@ def vote(request, question_id):
     choice.save()
 
     return HttpResponseRedirect(reverse('poll:results', args=(question.id,)))
-
-
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-
-    return render(request, 'poll/result.html', {
-        'question': question
-    })
